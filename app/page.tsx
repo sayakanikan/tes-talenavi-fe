@@ -6,19 +6,36 @@ import Link from "next/link";
 
 const Home = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
+    fetchMovies();
+  }, []);
+
+  const fetchMovies = () => {
     api
-      .get("/movies")
+      .get("/movies", { params: { title: searchQuery } })
       .then((response) => setMovies(response.data))
       .catch((err) => console.error("Error fetching movies:", err));
-  }, []);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">Movies Collection</h1>
-        <div className="flex justify-end mb-6">
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex">
+            <input
+              type="text"
+              placeholder="Search by title..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 w-full max-w-sm"
+            />
+            <button onClick={() => fetchMovies()} className="ml-4 px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700">
+              Search
+            </button>
+          </div>
           <Link href="/movies/form">
             <button className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700">Add New Movie</button>
           </Link>

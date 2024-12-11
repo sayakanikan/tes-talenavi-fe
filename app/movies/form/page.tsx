@@ -25,18 +25,18 @@ const CreateEditMovie = () => {
       })
       .catch((err) => console.error("Error fetching genres:", err));
 
-      if (movieId) {
-        api
-          .get(`/movies/${movieId}`)
-          .then((response) => {
-            const movie = response.data;
-            setTitle(movie.title || "");
-            setDirector(movie.director || "");
-            setSummary(movie.summary || "");
-            setGenres(movie.genres.map((genre: Genre) => genre.id));
-          })
-          .catch((err) => console.error("Error fetching movie:", err));
-      }
+    if (movieId) {
+      api
+        .get(`/movies/${movieId}`)
+        .then((response) => {
+          const movie = response.data;
+          setTitle(movie.title || "");
+          setDirector(movie.director || "");
+          setSummary(movie.summary || "");
+          setGenres(movie.genres.map((genre: Genre) => genre.id));
+        })
+        .catch((err) => console.error("Error fetching movie:", err));
+    }
   }, [movieId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,8 +67,21 @@ const CreateEditMovie = () => {
   };
 
   const filterGenre = (genreId: number) => {
-    console.log(genres)
+    console.log(genres);
     return genres.includes(genreId);
+  };
+
+  const handleDelete = async () => {
+    if (!movieId) return;
+
+    try {
+      await api.delete(`/movies/${movieId}`);
+      toast.success("Movie deleted successfully!");
+      router.push("/");
+    } catch (err) {
+      console.error("Error deleting movie:", err);
+      toast.error("An error occurred while deleting the movie.");
+    }
   };
 
   return (
@@ -132,6 +145,15 @@ const CreateEditMovie = () => {
             <button type="submit" className={`w-full py-2 px-4 rounded-md text-white font-medium ${movieId ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-500 hover:bg-green-600"}`}>
               {movieId ? "Update" : "Save"}
             </button>
+            {movieId && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="w-full py-2 px-4 rounded-md text-white font-medium bg-red-500 hover:bg-red-600"
+              >
+                Delete
+              </button>
+            )}
             <Link href="/">
               <button type="button" className="w-full py-2 px-4 rounded-md bg-indigo-600 text-white hover:bg-indigo-700">
                 Cancel
